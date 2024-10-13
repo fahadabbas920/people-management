@@ -20,7 +20,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // People API routes
-Route::prefix('api')->middleware(['auth'], )->group(function () {
+Route::prefix('api')->group(function () {
     Route::get('/people', [PeopleController::class, 'index'])->name('api.people.index');
     Route::post('/people', [PeopleController::class, 'store'])->name('api.people.store');
     Route::get('/people/{id}', [PeopleController::class, 'show'])->name('api.people.show');
