@@ -19,4 +19,8 @@ class People extends Model
         'language',
         'interests',
     ];
+
+    protected $casts = [
+        'interests' => 'array', // Cast interests to an array
+    ];
 }

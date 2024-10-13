@@ -17,7 +17,7 @@ class CreatePeopleTable extends Migration
             $table->string('email')->unique(); // Email Address
             $table->date('date_of_birth'); // Date of Birth
             $table->string('language'); // Language preference
-            $table->json('interests')->nullable(); // Interests (multiple values stored as JSON)
+            $table->json('interests'); // Interests (array of strings)
             $table->timestamps(); // Created at and Updated at fields
         });
     }

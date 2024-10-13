@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\PeopleController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -14,13 +15,18 @@ Route::get('/', function () {
     ]);
 });
 
-use App\Http\Controllers\PeopleController;
-
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/people', [PeopleController::class, 'index'])->middleware(['auth']);
+// People API routes
+Route::prefix('api')->middleware(['auth'], )->group(function () {
+    Route::get('/people', [PeopleController::class, 'index'])->name('api.people.index');
+    Route::post('/people', [PeopleController::class, 'store'])->name('api.people.store');
+    Route::get('/people/{id}', [PeopleController::class, 'show'])->name('api.people.show');
+    Route::put('/people/{id}', [PeopleController::class, 'update'])->name('api.people.update');
+    Route::delete('/people/{id}', [PeopleController::class, 'destroy'])->name('api.people.destroy');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -28,5 +34,5 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 

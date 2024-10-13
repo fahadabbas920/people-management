@@ -57,3 +57,15 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 });
+
+// API routes for authentication
+Route::prefix('api')->group(function () {
+        Route::post('login', [AuthenticatedSessionController::class, 'apiLogin']);
+        Route::post('register', [RegisteredUserController::class, 'apiRegister']);
+        Route::post('forgot-password', [PasswordResetLinkController::class, 'apiStore']);
+        Route::post('reset-password', [NewPasswordController::class, 'apiStore']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('logout', [AuthenticatedSessionController::class, 'apiLogout']);
+    });
+});
