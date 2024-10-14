@@ -8,7 +8,7 @@ const initialValue = {
     email: "",
     date_of_birth: "",
     language: "",
-    interests: [],
+    interests: [], // Still an array for storing interests
 };
 
 const AddPersonModal = ({
@@ -19,6 +19,7 @@ const AddPersonModal = ({
     onEdit,
 }) => {
     const [formData, setFormData] = useState(initialValue);
+    const [interestsInput, setInterestsInput] = useState(""); // New state for interests input as text
     const [errors, setErrors] = useState({});
     console.log(formData);
 
@@ -34,9 +35,11 @@ const AddPersonModal = ({
                 language: person.language || "",
                 interests: person.interests || [],
             });
+            setInterestsInput(person.interests?.join(", ") || ""); // Populate input field with comma-separated interests
         }
         return () => {
             setFormData(initialValue);
+            setInterestsInput(""); // Reset the interests input on modal close
             setErrors({});
         };
     }, [person]);
@@ -85,15 +88,27 @@ const AddPersonModal = ({
         setFormData({ ...formData, [name]: value });
     };
 
+    // Function to handle interests input
+    const handleInterestsChange = (e) => {
+        setInterestsInput(e.target.value); // Update the raw text input
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         const validationErrors = validateForm();
 
         if (Object.keys(validationErrors).length === 0) {
+            // Split interests input into an array and set it in formData
+            const interestsArray = interestsInput
+                .split(",")
+                .map((interest) => interest.trim())
+                .filter(Boolean); // Remove empty strings
+            setFormData({ ...formData, interests: interestsArray });
+
             if (!!person) {
-                onEdit(person?.id, formData);
+                onEdit(person?.id, { ...formData, interests: interestsArray });
             } else {
-                onAdd(formData);
+                onAdd({ ...formData, interests: interestsArray });
             }
             onClose();
         } else {
@@ -102,16 +117,6 @@ const AddPersonModal = ({
     };
 
     if (!isOpen) return null;
-
-    const handleCheckboxChange = (e) => {
-        const { value, checked } = e.target;
-        setFormData((prevData) => {
-            const updatedInterests = checked
-                ? [...prevData.interests, value]
-                : prevData.interests.filter((interest) => interest !== value);
-            return { ...prevData, interests: updatedInterests };
-        });
-    };
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -252,7 +257,7 @@ const AddPersonModal = ({
                         )}
                     </div>
                     {/* Language */}
-                    <div className="col-span-1">
+                    <div className="col-span-2">
                         <label className="block font-medium text-gray-700">
                             Language
                         </label>
@@ -261,60 +266,39 @@ const AddPersonModal = ({
                             name="language"
                             value={formData.language}
                             onChange={handleChange}
-                            className={`mt-1 block w-48 rounded-md border-gray-300 shadow-sm ${
+                            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm ${
                                 errors.language && "border-red-500"
                             }`}
-                            required
                         />
                         {errors.language && (
                             <p className="text-red-500">{errors.language}</p>
                         )}
                     </div>
-                    {/* Interests (Checkboxes) */}
+                    {/* Interests */}
                     <div className="col-span-2">
                         <label className="block font-medium text-gray-700">
-                            Interests
+                            Interests (comma-separated)
                         </label>
-                        <div className="flex flex-col">
-                            {["Interest1", "Interest2", "Interest3"].map(
-                                (interest) => (
-                                    <label
-                                        key={interest}
-                                        className="flex items-center"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            value={interest}
-                                            checked={formData.interests.includes(
-                                                interest
-                                            )}
-                                            onChange={handleCheckboxChange}
-                                            className="mr-2"
-                                        />
-                                        {interest}
-                                    </label>
-                                )
-                            )}
-                        </div>
+                        <input
+                            type="text"
+                            name="interests"
+                            value={interestsInput} // Use the new interests input state
+                            onChange={handleInterestsChange} // Update as the user types
+                            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm ${
+                                errors.interests && "border-red-500"
+                            }`}
+                        />
+                        {errors.interests && (
+                            <p className="text-red-500">{errors.interests}</p>
+                        )}
                     </div>
-                    <div className="col-span-2 mt-0 flex justify-end">
+                    {/* Submit Button */}
+                    <div className="col-span-2">
                         <button
                             type="submit"
-                            className="bg-blue-500 text-white px-4 py-0 rounded"
+                            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md"
                         >
-                            {person ? "Edit Person" : "Add Person"}
-                        </button>
-                        <button
-                            onClick={() => {
-                                onClose();
-                                setErrors({});
-                                setFormData(initialValue)
-                                
-                            }}
-                            type="button"
-                            className="ml-4 text-red-500"
-                        >
-                            Cancel
+                            {person ? "Update Person" : "Add Person"}
                         </button>
                     </div>
                 </form>

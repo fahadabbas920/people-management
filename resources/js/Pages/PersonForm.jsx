@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { Inertia } from '@inertiajs/inertia';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Inertia } from "@inertiajs/inertia";
+import { useParams } from "react-router-dom";
 
 const PersonForm = ({ person }) => {
-    const [formData, setFormData] = useState({
-        name: '',
-        surname: '',
-        south_african_id_number: '',
-        mobile_number: '',
-        email: '',
-        date_of_birth: '',
-        language: '',
-        interests: []
-    });
-    const interestsOptions = ['Reading', 'Sports', 'Travelling', 'Music'];
     const { id } = useParams();
+
+    const [formData, setFormData] = useState({
+        name: "",
+        surname: "",
+        south_african_id_number: "",
+        mobile_number: "",
+        email: "",
+        date_of_birth: "",
+        language: "",
+        interests: "", // Change to string for comma-separated input
+    });
 
     useEffect(() => {
         if (person) {
@@ -23,24 +23,41 @@ const PersonForm = ({ person }) => {
     }, [person]);
 
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
+        const { name, value } = e.target;
+        setFormData((prev) => ({
             ...prev,
-            [name]: type === 'checkbox' ? (checked ? [...prev.interests, value] : prev.interests.filter(i => i !== value)) : value
+            [name]: value, // Update formData for all inputs
         }));
+    };
+
+    const transformInterestsToArray = () => {
+        // Transform the comma-separated string into an array
+        const interestsArray = formData.interests
+            .split(",")
+            .map((interest) => interest.trim()) // Trim whitespace from each interest
+            .filter((interest) => interest); // Remove empty strings
+
+        return interestsArray;
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const url = id ? `/people/${id}` : '/people';
-        const method = id ? 'PUT' : 'POST';
+        const interestsArray = transformInterestsToArray(); // Get the transformed array
 
-        Inertia[method.toLowerCase()](url, formData); // Use Inertia to submit the form
+        // Prepare the data for submission
+        const dataToSubmit = { ...formData, interests: interestsArray };
+
+        const url = id ? `/people/${id}` : "/people";
+        const method = id ? "PUT" : "POST";
+
+        Inertia[method.toLowerCase()](url, dataToSubmit); // Use Inertia to submit the form
     };
 
     return (
         <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-10">
-            <h2 className="text-xl font-semibold mb-4">{id ? 'Edit Person' : 'Add Person'}</h2>
+            <h2 className="text-xl font-semibold mb-4">
+                {id ? "Edit Person" : "Add Person"}
+            </h2>
             <input
                 type="text"
                 name="name"
@@ -94,37 +111,30 @@ const PersonForm = ({ person }) => {
                 required
                 className="w-full p-2 border border-gray-300 rounded mb-4"
             />
-            <select
+            <input
+                type="text"
                 name="language"
                 value={formData.language}
                 onChange={handleChange}
+                placeholder="Enter your preferred language"
                 required
                 className="w-full p-2 border border-gray-300 rounded mb-4"
+            />
+
+            <input
+                type="text"
+                name="interests"
+                value={formData.interests}
+                onChange={handleChange}
+                placeholder="Enter your interests, separated by commas"
+                className="w-full p-2 border border-gray-300 rounded mb-4"
+            />
+
+            <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded"
             >
-                <option value="">Select Language</option>
-                <option value="English">English</option>
-                <option value="Afrikaans">Afrikaans</option>
-                {/* Add other languages as needed */}
-            </select>
-
-            <div className="mb-4">
-                <h4>Interests:</h4>
-                {interestsOptions.map((interest) => (
-                    <label key={interest} className="inline-flex items-center">
-                        <input
-                            type="checkbox"
-                            value={interest}
-                            checked={formData.interests.includes(interest)}
-                            onChange={handleChange}
-                            className="mr-2"
-                        />
-                        {interest}
-                    </label>
-                ))}
-            </div>
-
-            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-                {id ? 'Update Person' : 'Add Person'}
+                {id ? "Update Person" : "Add Person"}
             </button>
         </form>
     );
