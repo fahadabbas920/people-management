@@ -18,9 +18,18 @@ class People extends Model
         'date_of_birth',
         'language',
         'interests',
+        'user_id', // Ensure this is included in fillable
     ];
 
     protected $casts = [
         'interests' => 'array', // Cast interests to an array
     ];
+
+    /**
+     * Get the user that owns the people.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

@@ -34,7 +34,7 @@ export default function Dashboard() {
                 console.error(errors);
             },
         });
-        window.location.reload();
+        // window.location.reload();
     };
 
     const handleUpdate = (id, formData) => {
@@ -48,7 +48,7 @@ export default function Dashboard() {
             },
         });
         setEditPerson(null);
-        window.location.reload();
+        // window.location.reload();
     };
     const handleDelete = (id) => {
         if (confirm("Are you sure you want to delete this person?")) {
@@ -61,7 +61,7 @@ export default function Dashboard() {
                 },
             });
         }
-        window.location.reload();
+        // window.location.reload();
     };
 
     return (
