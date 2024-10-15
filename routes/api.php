@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\PeopleController;
 use Illuminate\Support\Facades\Route;
+use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 
+Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
 // People API routes
-Route::middleware('auth')->prefix('api')->group(function () {
+Route::middleware(['auth:sanctum', 'cors'])->prefix('api')->group(function () {
     Route::get('/people', [PeopleController::class, 'index'])->name('api.people.index');
     Route::post('/people', [PeopleController::class, 'store'])->name('api.people.store');
     Route::get('/people/{id}', [PeopleController::class, 'show'])->name('api.people.show');

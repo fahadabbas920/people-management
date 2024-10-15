@@ -107,7 +107,8 @@ class PeopleController extends Controller
 public function destroy($id)
 {
     try {
-        $response = $this->peopleService->deletePerson($id. auth()->id());
+        // Pass both the person ID and the current user's ID to the deletePerson method
+        $response = $this->peopleService->deletePerson($id, auth()->id());
         return response()->json($response, 200);
     } catch (ModelNotFoundException $e) {
         return response()->json(['message' => 'Person not found.'], 404);
@@ -116,5 +117,6 @@ public function destroy($id)
         return response()->json(['message' => 'Error deleting person.'], 500);
     }
 }
+
 
 }
