@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\People; // Ensure this is correct
 use Illuminate\Support\Facades\DB;
 
 class PeopleSeeder extends Seeder
@@ -36,6 +35,43 @@ class PeopleSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'name' => 'Alice',
+                'surname' => 'Johnson',
+                'south_african_id_number' => '8503037009089',
+                'mobile_number' => '0834567890',
+                'email' => 'alice.johnson@example.com',
+                'date_of_birth' => '1985-03-03',
+                'language' => 'English',
+                'interests' => json_encode(['Traveling', 'Photography']),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Bob',
+                'surname' => 'Brown',
+                'south_african_id_number' => '7504048009090',
+                'mobile_number' => '0845678901',
+                'email' => 'bob.brown@example.com',
+                'date_of_birth' => '1975-04-04',
+                'language' => 'Zulu',
+                'interests' => json_encode(['Football', 'Gaming']),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Charlie',
+                'surname' => 'Davis',
+                'south_african_id_number' => '6405059009091',
+                'mobile_number' => '0856789012',
+                'email' => 'charlie.davis@example.com',
+                'date_of_birth' => '1995-05-05',
+                'language' => 'Xhosa',
+                'interests' => json_encode(['Music', 'Art']),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
     }
 }
+

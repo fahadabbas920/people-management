@@ -6,9 +6,9 @@ use App\Models\People;
 
 class PeopleRepository
 {
-    public function all()
+    public function allByUser($userId)
     {
-        return People::all();
+        return People::where('user_id', $userId)->get();
     }
 
     public function create(array $data)
@@ -16,9 +16,9 @@ class PeopleRepository
         return People::create($data);
     }
 
-    public function find($id)
+    public function findByIdAndUser($id, $userId)
     {
-        return People::findOrFail($id);
+        return People::where('id', $id)->where('user_id', $userId)->firstOrFail();
     }
 
     public function update(People $person, array $data)
