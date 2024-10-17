@@ -2,66 +2,103 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import People from "./People"; // Adjust the import path if necessary
 import { useEffect, useState } from "react";
-import { Inertia } from "@inertiajs/inertia";
 import AddPersonModal from "../Components/AddPersonModal"; // Import the modal component
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 export default function Dashboard() {
     const [people, setPeople] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editPerson, setEditPerson] = useState(null);
+    const [refetchData,setRefetchData] = useState(false);
 
     useEffect(() => {
+        fetchPeople();
+    }, [refetchData]);
+
+    const fetchPeople = () => {
         fetch("/api/people")
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-                setPeople(data);
+            .then(response => {
+                // if (!response.ok) {
+                //     throw new Error('Network response was not ok');
+                // }
+                return response.json();
             })
-            .catch((error) => console.error("Error fetching people:", error));
-    }, []);
+            .then(data => {
+                setPeople(data);
+
+            })
+            .catch(error => {
+                toast.error(error?.response?.data?.message || "Something went wrong")
+            });
+    };
+
+    const handleAddPerson = (newPerson) => {
+        fetch("/api/people", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-Token": getCsrfToken(),
+            },
+            body: JSON.stringify(newPerson),
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            setRefetchData(state=>!state)
+            toast.success("Added succesfully")
+        })
+        .catch(error => {
+           toast.error("Error adding person");
+        });
+    };
+
+    const handleUpdate = (id, formData) => {
+        fetch(`/api/people/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-Token": getCsrfToken(), // Ensure you have a function for this
+            },
+            body: JSON.stringify(formData),
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            setRefetchData(state=>!state)
+            setEditPerson(null);
+            toast.success("updated succesfully")
+
+        })
+        .catch(error => {
+           toast.error("Error updating person");
+        });
+    };
+
+    const handleDelete = (id) => {
+        if (confirm("Are you sure you want to delete this person?")) {
+            fetch(`/api/people/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRF-Token": getCsrfToken(),
+                },
+            })
+            .then(response => {
+                setRefetchData(state=>!state)
+            toast.success("Deleted succesfully")
+            })
+            .catch(error => {
+                toast.error("Error deleting person");
+            });
+        }
+    };
 
     const getCsrfToken = () => {
         const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
         return match ? match[1] : "";
-    };
-
-    const handleAddPerson = (newPerson) => {
-        Inertia.post("/api/people", newPerson, {
-            onSuccess: () => {
-                console.log("Person added successfully");
-            },
-            onError: (errors) => {
-                console.error(errors);
-            },
-        });
-        window.location.reload();
-    };
-
-    const handleUpdate = (id, formData) => {
-        console.log(id, formData);
-        Inertia.put(`/api/people/${id}`, formData, {
-            onSuccess: () => {
-                console.log("Person updated:", id);
-            },
-            onError: (errors) => {
-                console.error("Error updating person:", errors);
-            },
-        });
-        setEditPerson(null);
-        window.location.reload();
-    };
-    const handleDelete = (id) => {
-        if (confirm("Are you sure you want to delete this person?")) {
-            Inertia.delete(`/api/people/${id}`, {
-                onSuccess: () => {
-                    console.log("Person deleted:", id);
-                },
-                onError: (errors) => {
-                    console.error("Error deleting person:", errors);
-                },
-            });
-        }
-        window.location.reload();
     };
 
     return (
@@ -109,6 +146,7 @@ export default function Dashboard() {
                 onEdit={handleUpdate}
                 // setIsModalOpen={setIsModalOpen}
             />
+             <ToastContainer />
         </AuthenticatedLayout>
     );
 }

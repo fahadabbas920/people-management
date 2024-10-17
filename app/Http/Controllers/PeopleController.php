@@ -9,6 +9,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\User;
 
 class PeopleController extends Controller
 {
